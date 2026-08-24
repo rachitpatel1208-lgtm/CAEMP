@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}History — CAEMP{% endblock %}
+{% block crumb %}Scan History{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Scan Archive</p>
+    <h1 class="page-title">Scan History</h1>
+    <p class="page-subtitle">{{ runs|length }} recorded scan{{ 's' if runs|length != 1 else '' }} across all monitored assets</p>
+  </div>
+  <a href="{{ url_for('dashboard') }}" class="btn btn-primary">+ New Scan</a>
+</div>
+
+<section class="panel">
+  <div class="panel-head">
+    <h2>All Scans</h2>
+    <div class="table-toolbar">
+      <input type="text" id="history-search" class="table-search" placeholder="Search target...">
+      <select id="risk-filter" class="table-select">
+        <option value="">All Risk Levels</option>
+        <option value="HIGH">High</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="LOW">Low</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="data-table" id="history-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-key="date">Date <span class="sort-arrow"></span></th>
+          <th class="sortable" data-key="target">Target <span class="sort-arrow"></span></th>
+          <th class="sortable" data-key="risk">Risk Score <span class="sort-arrow"></span></th>
+          <th data-key="level">Risk Level</th>
+          <th class="sortable" data-key="ports">Open Ports <span class="sort-arrow"></span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in runs %}
+        <tr class="row-clickable" data-target="{{ r['target']|lower }}" data-level="{{ r['risk_level'] }}" onclick="window.location='{{ url_for('scan_results', scan_uid=r['scan_uid']) }}'">
+          <td data-label="Date" class="mono dim">{{ r["scan_date"] }}</td>
+          <td data-label="Target" class="mono">{{ r["target"] }}</td>
+          <td data-label="Risk Score" class="mono">{{ r["total_risk"] }}</td>
+          <td data-label="Risk Level"><span class="badge badge-{{ 'critical' if r['risk_level'] == 'HIGH' else ('medium' if r['risk_level'] == 'MEDIUM' else 'low') }}">{{ r["risk_level"] }}</span></td>
+          <td data-label="Open Ports" class="mono">{{ r["open_ports"] }}</td>
+          <td><a href="{{ url_for('scan_results', scan_uid=r['scan_uid']) }}" class="row-link">View →</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="empty-row">No scans recorded yet. Run a scan from the Dashboard to populate history.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}

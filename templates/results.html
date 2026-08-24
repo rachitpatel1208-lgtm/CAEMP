@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}Scan Results — CAEMP{% endblock %}
+{% block crumb %}Scan Results{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">Scan Result &middot; {{ scan_uid }}</p>
+    <h1 class="page-title">{{ run["target"] }}</h1>
+    <p class="page-subtitle">Completed {{ run["scan_date"] }} &middot; Duration {{ "%.1f"|format(run["duration_seconds"]) }}s</p>
+  </div>
+  <div style="display:flex; gap:10px;">
+    <a href="{{ url_for('reports') }}" class="btn btn-ghost">View Reports</a>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">+ New Scan</a>
+  </div>
+</div>
+
+<!-- Summary cards -->
+<section class="stat-grid" style="grid-template-columns: repeat(5, 1fr);">
+  <div class="stat-card" style="text-align:center;">
+    <div class="gauge-wrap">
+      <svg viewBox="0 0 120 120" class="gauge-svg">
+        <circle cx="60" cy="60" r="50" class="gauge-track"/>
+        <circle cx="60" cy="60" r="50" class="gauge-fill" id="gauge-fill" data-score="{{ run['total_risk'] }}"/>
+      </svg>
+      <div class="gauge-center">
+        <span class="gauge-value">{{ run["total_risk"] }}</span>
+        <span class="gauge-label">/ 100</span>
+      </div>
+    </div>
+    <p class="stat-label" style="margin-top:10px;">Risk Score</p>
+  </div>
+
+  <div class="stat-card" style="text-align:center;">
+    <p class="stat-value risk-{{ run['risk_level']|lower }}">{{ run["risk_level"] }}</p>
+    <p class="stat-label">Risk Level</p>
+  </div>
+
+  <div class="stat-card" style="text-align:center;">
+    <p class="stat-value">{{ run["open_ports"] }}</p>
+    <p class="stat-label">Open Ports</p>
+  </div>
+
+  <div class="stat-card" style="text-align:center;">
+    <p class="stat-value">{{ run["services_detected"] }}</p>
+    <p class="stat-label">Services Detected</p>
+  </div>
+
+  <div class="stat-card" style="text-align:center;">
+    <p class="stat-value">{{ "%.1f"|format(run["duration_seconds"]) }}s</p>
+    <p class="stat-label">Scan Duration</p>
+  </div>
+</section>
+
+<!-- Executive summary -->
+<section class="panel">
+  <div class="panel-head"><h2>Executive Summary</h2></div>
+  <div class="exec-summary-grid">
+    <div class="exec-summary-item">
+      <div class="exec-summary-label">Overall Posture</div>
+      <div class="exec-summary-value risk-{{ run['risk_level']|lower }}">{{ run["risk_level"] }} RISK</div>
+    </div>
+    <div class="exec-summary-item">
+      <div class="exec-summary-label">Findings Recorded</div>
+      <div class="exec-summary-value">{{ findings|length }}</div>
+    </div>
+    <div class="exec-summary-item">
+      <div class="exec-summary-label">Exposure Drift</div>
+      <div class="exec-summary-value" id="exec-drift-value">—</div>
+    </div>
+  </div>
+  <p class="exec-summary-text" id="exec-summary-text">
+    This scan of <strong>{{ run["target"] }}</strong> identified {{ findings|length }} service{{ '' if findings|length == 1 else 's' }}
+    across open ports, producing a composite risk score of {{ run["total_risk"] }}/100 ({{ run["risk_level"] }}).
+    Review the findings and CVE tables below for remediation priorities.
+  </p>
+</section>
+
+<div class="analytics-grid">
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Severity Distribution</h2>
+        <p class="panel-sub">This scan only</p>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-severity"></canvas>
+    </div>
+    <div class="chart-legend" id="severity-legend"></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-head">
+      <div>
+        <h2>Open Port Distribution</h2>
+        <p class="panel-sub">Services discovered on this asset</p>
+      </div>
+    </div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chart-services"></canvas>
+    </div>
+  </section>
+</div>
+
+<!-- Findings table -->
+<section class="panel">
+  <div class="panel-head">
+    <h2>Findings</h2>
+    <input type="text" id="findings-search" class="table-search" placeholder="Search port, service, version, finding...">
+  </div>
+  <div class="table-wrap">
+    <table class="data-table" id="findings-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-key="port">Port <span class="sort-arrow"></span></th>
+          <th class="sortable" data-key="service">Service <span class="sort-arrow"></span></th>
+          <th class="sortable" data-key="version">Version <span class="sort-arrow"></span></th>
+          <th class="sortable" data-key="severity">Severity <span class="sort-arrow"></span></th>
+          <th>Finding</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for f in findings %}
+        <tr>
+          <td data-label="Port" class="mono">{{ f["port"] }}/{{ f["protocol"] }}</td>
+          <td data-label="Service" class="mono">{{ f["service"] }}</td>
+          <td data-label="Version" class="mono dim">{{ f["version"] }}</td>
+          <td data-label="Severity"><span class="badge badge-{{ f['severity']|lower }}">{{ f["severity"] }}</span></td>
+          <td data-label="Finding">{{ f["finding"] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty-row">No open services discovered on this target.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- CVE table -->
+<section class="panel">
+  <div class="panel-head">
+    <div>
+      <h2>Known Vulnerabilities (CVE)</h2>
+      <p class="panel-sub">Sourced from the National Vulnerability Database</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="data-table" id="cve-table">
+      <thead>
+        <tr>
+          <th>CVE ID</th>
+          <th>CVSS</th>
+          <th>Severity</th>
+          <th>Affected Service</th>
+          <th>Description</th>
+          <th>NVD</th>
+        </tr>
+      </thead>
+      <tbody id="cve-table-body">
+        <tr><td colspan="6" class="empty-row">Loading CVE data…</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- Recommendations -->
+<section class="panel">
+  <div class="panel-head"><h2>Security Recommendations</h2></div>
+  <div class="recommendation-list" id="recommendation-list">
+    <!-- populated by JS -->
+  </div>
+</section>
+
+<!-- Exposure changes (existing functionality, preserved) -->
+<section class="panel exposure-panel">
+  <div class="panel-head"><h2>Exposure Changes</h2></div>
+  <div class="exposure-grid" id="exposure-grid">
+    <!-- populated by JS from /api/scan/<id> -->
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  window.SCAN_UID = "{{ scan_uid }}";
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/results.js') }}"></script>
+{% endblock %}
