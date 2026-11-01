@@ -1,0 +1,7 @@
+Host,Port,State,Service,Version,Severity,Finding
+127.0.0.1,135,open,msrpc,Microsoft Windows RPC,Info,No immediate issue detected
+127.0.0.1,445,open,microsoft-ds,,High,SMB service detected - review exposure
+127.0.0.1,2179,open,vmrdp,,High,RDP service detected - review internet exposure
+127.0.0.1,5001,open,http,Werkzeug httpd 3.0.3,Info,No immediate issue detected
+127.0.0.1,5002,open,http,Werkzeug httpd 3.0.3,Info,No immediate issue detected
+127.0.0.1,9010,open,websocket,WebSocket++ 0.8.2,Info,No immediate issue detected

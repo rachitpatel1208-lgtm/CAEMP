@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}PhishGuard URL Scanner — Omnitrix Edition{% endblock %}
+{% block crumb %}Live URL Inspector{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="page-eyebrow">
+      <span class="status-dot pulse"></span>
+      GALVAN LEVEL-20 THREAT INTELLIGENCE &middot; MULTI-MODEL ML NEURAL CORE
+    </p>
+    <h1 class="page-title">Live URL Inspector &amp; Threat Analyzer</h1>
+    <p class="page-subtitle">Subword lexical topology, typosquatting &amp; homoglyph detection, multi-model consensus, and live DNS/SSL verification</p>
+  </div>
+
+  <div class="phish-engine-status-pill" id="phish-engine-status">
+    <span class="status-dot pulse"></span>
+    <span id="phish-engine-text">Omnitrix ML Neural Core: Initializing...</span>
+  </div>
+</div>
+
+<!-- ================= OMNITRIX URL SCANNING CONSOLE ================= -->
+<div class="scan-card phish-scan-card">
+  <div class="scan-card-top">
+    <h2 class="scan-card-title">
+      <span class="omnitrix-emblem-mini" style="width:28px; height:28px;">
+        <svg viewBox="0 0 100 100" style="width:16px; height:16px;">
+          <polygon points="12,12 88,12 50,47" />
+          <polygon points="12,88 88,88 50,53" />
+        </svg>
+      </span>
+      Inspect Suspicious Target URL
+    </h2>
+    <span class="scan-card-badge">3-Model ML Consensus Active</span>
+  </div>
+  <p class="scan-card-sub">
+    Evaluate URLs across 3 independent machine learning models (Lexical Random Forest, Subword Char N-Gram TF-IDF, and Gradient Boosting Ensemble) combined with live port 443 SSL cryptographic analysis, live DNS resolution, and brand lookalike detection.
+  </p>
+
+  <form id="url-scan-form" class="scan-form" autocomplete="off">
+    <div class="scan-input-wrap">
+      <span class="scan-input-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+      </span>
+      <input
+        id="url-input"
+        type="text"
+        class="scan-input"
+        placeholder="Enter target URL to inspect (e.g. http://paypa1-secure.login.verify.xyz/account)"
+        required
+      >
+      <button type="button" id="btn-clear-url" class="input-clear-btn" title="Clear input" style="display:none;">&times;</button>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center;">
+      <button type="button" id="btn-sample-url" class="btn-preset-action" title="Load real-world phishing sample">
+        Load Sample
+      </button>
+      <button type="submit" id="btn-inspect-url" class="scan-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        Inspect Target
+      </button>
+    </div>
+  </form>
+
+  <!-- Quick URL Presets -->
+  <div class="target-presets">
+    <span class="target-presets-label">Target Presets:</span>
+    <button type="button" class="preset-chip" data-url="http://paypa1-secure.login.verify.xyz/account?ref=8a2f">
+      <span>paypa1-secure.xyz</span>
+      <span class="target-meta">Typosquat Spoof</span>
+    </button>
+    <button type="button" class="preset-chip" data-url="https://google.com">
+      <span>google.com</span>
+      <span class="target-meta">Verified Clean</span>
+    </button>
+    <button type="button" class="preset-chip" data-url="http://apple-security-check.icu/verify?session=92">
+      <span>apple-security.icu</span>
+      <span class="target-meta">Suspicious TLD</span>
+    </button>
+    <button type="button" class="preset-chip" data-url="http://192.168.1.1/admin/login">
+      <span>192.168.1.1/admin</span>
+      <span class="target-meta">Raw IP Host</span>
+    </button>
+  </div>
+
+  <p id="url-scan-error" class="scan-error" hidden></p>
+</div>
+
+<!-- ================= SCANNING OVERLAY ================= -->
+<div id="phish-scanning-box" class="phish-scanning-box" style="display:none;">
+  <div class="omnitrix-radar-loader">
+    <div class="radar-sweep"></div>
+    <div class="radar-core">
+      <svg viewBox="0 0 100 100">
+        <polygon points="12,12 88,12 50,47" />
+        <polygon points="12,88 88,88 50,53" />
+      </svg>
+    </div>
+  </div>
+  <div class="scanning-details">
+    <h3 class="scanning-headline">Consulting Omnitrix Multi-Model Neural Ensemble...</h3>
+    <div class="scanning-steps-list">
+      <div class="scan-step-item" id="step-lexical"><span class="step-bullet">&#9670;</span> Computing Shannon Entropy &amp; Lexical Vectors</div>
+      <div class="scan-step-item" id="step-typo"><span class="step-bullet">&#9670;</span> Scanning Brand Dictionary &amp; Unicode Homoglyphs</div>
+      <div class="scan-step-item" id="step-ml"><span class="step-bullet">&#9670;</span> Running Random Forest, Char N-Gram &amp; Gradient Boosting</div>
+      <div class="scan-step-item" id="step-net"><span class="step-bullet">&#9670;</span> Probing Live Host DNS &amp; Port 443 SSL Handshake</div>
+      <div class="scan-step-item" id="step-ai"><span class="step-bullet">&#9670;</span> Synthesizing AI Defensive Threat Advisory</div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= RESULTS VIEW CONTAINER ================= -->
+<div id="phish-results-container">
+  <!-- Empty placeholder state before scan -->
+  <div class="phish-empty-card" id="phish-empty-state">
+    <div class="omnitrix-idle-dial">
+      <div class="idle-dial-ring"></div>
+      <div class="omnitrix-core-center" style="width:70px; height:70px;">
+        <svg viewBox="0 0 100 100" style="width:36px; height:36px; fill:var(--omnitrix-green);">
+          <polygon points="15,15 85,15 50,47" />
+          <polygon points="15,85 85,85 50,53" />
+        </svg>
+      </div>
+    </div>
+    <h3 style="font-family:var(--font-display); color:var(--text-main); margin-bottom:8px; font-size:16px;">
+      Ready for Neural URL Analysis
+    </h3>
+    <p style="color:var(--text-muted); max-width:540px; margin:0 auto; font-size:13.5px;">
+      Enter any suspicious web address, shortened link, or domain name above to trigger deep structural feature extraction, brand spoof detection, and multi-model consensus validation.
+    </p>
+  </div>
+
+  <!-- Dynamic scan output filled via JavaScript -->
+  <div id="url-output" style="display:none;"></div>
+</div>
+
+<!-- ================= PERSISTENT RECENT URL SCANS ================= -->
+<div class="history-card" id="url-history-section" style="margin-top:36px;">
+  <div class="history-card-header">
+    <div>
+      <h2 class="history-card-title">Recent URL Threat Log</h2>
+      <p class="history-card-sub">Recorded URL surveillance history and consensus ratings from the local Omnitrix database</p>
+    </div>
+    <div style="display:flex; gap:10px;">
+      <button type="button" id="btn-refresh-history" class="btn-preset-action">Refresh Log</button>
+      <button type="button" id="btn-clear-history" class="btn-danger-action">Clear History</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="data-table" id="url-history-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Inspected Target URL</th>
+          <th>Hostname</th>
+          <th>Threat Score</th>
+          <th>Verdict</th>
+          <th>ML Models Flagged</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="url-history-body">
+        <tr>
+          <td colspan="7" style="text-align:center; padding:24px; color:var(--text-dim);">
+            Loading recent URL scan history...
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/phishguard.js') }}"></script>
+{% endblock %}

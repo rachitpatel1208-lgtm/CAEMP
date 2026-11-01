@@ -1,0 +1,10 @@
+Host,Port,State,Service,Version,Severity,Finding
+192.168.2.55,21,open,tcpwrapped,,Info,No immediate issue detected
+192.168.2.55,23,open,telnet,Microsoft Windows XP telnetd,Critical,Telnet detected - plaintext authentication
+192.168.2.55,80,open,http,Microsoft IIS httpd 8.5,Info,No immediate issue detected
+192.168.2.55,135,open,msrpc,Microsoft Windows RPC,Info,No immediate issue detected
+192.168.2.55,139,open,netbios-ssn,Microsoft Windows netbios-ssn,Info,No immediate issue detected
+192.168.2.55,445,open,microsoft-ds,Microsoft Windows Server 2008 R2 - 2012 microsoft-ds,High,SMB service detected - review exposure
+192.168.2.55,5985,open,http,Microsoft HTTPAPI httpd 2.0,Info,No immediate issue detected
+192.168.2.55,49154,open,msrpc,Microsoft Windows RPC,Info,No immediate issue detected
+192.168.2.55,49155,open,msrpc,Microsoft Windows RPC,Info,No immediate issue detected

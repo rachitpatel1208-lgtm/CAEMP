@@ -1,0 +1,5 @@
+Host,Port,State,Service,Version,Severity,Finding
+142.251.221.238,21,open,ftp,,High,FTP detected - insecure protocol
+142.251.221.238,80,open,http,gws,Info,No immediate issue detected
+142.251.221.238,443,open,https,gws,Info,No immediate issue detected
+142.251.221.238,6346,closed,gnutella,,Info,No immediate issue detected

@@ -1,0 +1,107 @@
+{
+  "trained_at": "2026-09-24 00:53:05",
+  "url_dataset_size": 4000,
+  "url_features": [
+    "url_length",
+    "hostname_length",
+    "path_length",
+    "count_dots",
+    "count_hyphens",
+    "count_slashes",
+    "count_at",
+    "count_question",
+    "count_equals",
+    "count_percent",
+    "count_underscore",
+    "count_tilde",
+    "ratio_digits_url",
+    "ratio_digits_host",
+    "is_ip",
+    "is_shortener",
+    "is_suspicious_tld",
+    "has_https",
+    "has_port",
+    "subdomain_count",
+    "domain_entropy",
+    "url_entropy",
+    "phishing_keyword_count",
+    "has_consecutive_hyphens",
+    "has_double_slash_in_path"
+  ],
+  "models": {
+    "model_lexical_rf": {
+      "name": "Lexical Random Forest",
+      "type": "Structural & Lexical Heuristic RF",
+      "accuracy": 0.9875,
+      "precision": 0.9974,
+      "recall": 0.9775,
+      "f1_score": 0.9874,
+      "roc_auc": 0.9992,
+      "description": "Analyzes 25+ structural properties including Shannon entropy, digit ratios, TLD risks, and subdomain depth.",
+      "top_features": [
+        {
+          "feature": "has_https",
+          "importance": 0.142
+        },
+        {
+          "feature": "hostname_length",
+          "importance": 0.1316
+        },
+        {
+          "feature": "url_entropy",
+          "importance": 0.1257
+        },
+        {
+          "feature": "domain_entropy",
+          "importance": 0.0799
+        },
+        {
+          "feature": "ratio_digits_url",
+          "importance": 0.0794
+        },
+        {
+          "feature": "phishing_keyword_count",
+          "importance": 0.079
+        },
+        {
+          "feature": "is_suspicious_tld",
+          "importance": 0.0716
+        },
+        {
+          "feature": "ratio_digits_host",
+          "importance": 0.0602
+        }
+      ]
+    },
+    "model_ngram_tfidf": {
+      "name": "Char N-Gram TF-IDF Classifier",
+      "type": "Subword Pattern Logistic Regression",
+      "accuracy": 0.9875,
+      "precision": 1.0,
+      "recall": 0.975,
+      "f1_score": 0.9873,
+      "roc_auc": 0.9998,
+      "description": "Direct character n-gram inspection (3-to-5 grams) capturing subtle typosquatting, character obfuscation, and brand impersonation tokens."
+    },
+    "model_gradient_boost": {
+      "name": "Gradient Boosting Ensemble",
+      "type": "Boosted Decision Trees",
+      "accuracy": 0.9862,
+      "precision": 0.9949,
+      "recall": 0.9775,
+      "f1_score": 0.9861,
+      "roc_auc": 0.9977,
+      "description": "Sequential tree boosting capable of modeling non-linear interactions across domain age, token density, and query parameters."
+    },
+    "model_email_nlp": {
+      "name": "Email Threat NLP Classifier",
+      "type": "TF-IDF Word N-Gram Naive Bayes",
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "roc_auc": 1.0,
+      "description": "Scans semantic patterns, urgency triggers, credential harvesting language, and social engineering motifs."
+    }
+  }
+}

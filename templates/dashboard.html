@@ -1,0 +1,552 @@
+{% extends "base.html" %}
+{% block title %}CAEMP &bull; PhishGuard — Omnitrix Unified Platform{% endblock %}
+{% block crumb %}Executive Dashboard{% endblock %}
+
+{% block content %}
+
+<!-- =====================================================================
+     SECTION 1: CAEMP CYBER ASSET EXPOSURE MONITORING PLATFORM
+     ===================================================================== -->
+<div id="section-caemp" class="platform-section active">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">
+        <span class="status-dot pulse"></span>
+        SECURITY POSTURE OVERVIEW &middot; OMNITRIX EDITION
+      </p>
+      <h1 class="page-title">Executive Security Dashboard</h1>
+      <p class="page-subtitle">Network exposure surveillance, port enumeration, and NIST NVD vulnerability tracking</p>
+    </div>
+  </div>
+
+  <!-- CAEMP In-Page Sub-Navigation -->
+  <div class="caemp-subnav-bar">
+    <button type="button" class="caemp-subnav-btn active" id="btn-subnav-overview" onclick="window.switchCaempSubview('overview')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Executive Overview</span>
+    </button>
+    <button type="button" class="caemp-subnav-btn" id="btn-subnav-history" onclick="window.switchCaempSubview('history')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span>Scan History Archive ({{ runs|length }})</span>
+    </button>
+    <button type="button" class="caemp-subnav-btn" id="btn-subnav-reports" onclick="window.switchCaempSubview('reports')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
+      <span>Security Reports ({{ runs|length }})</span>
+    </button>
+  </div>
+
+  <!-- SUBVIEW A: EXECUTIVE OVERVIEW -->
+  <div id="caemp-view-overview" class="caemp-subview active">
+    <!-- Scan Console -->
+    <div class="scan-card">
+      <div class="scan-card-top">
+        <h2 class="scan-card-title">
+          <span class="omnitrix-emblem-mini" style="width:28px; height:28px;">
+            <svg viewBox="0 0 100 100" style="width:16px; height:16px;">
+              <polygon points="12,12 88,12 50,47" />
+              <polygon points="12,88 88,88 50,53" />
+            </svg>
+          </span>
+          Run a New Scan
+        </h2>
+        <span class="scan-card-badge">Omnitrix Engine Active</span>
+      </div>
+      <p class="scan-card-sub">Discover open ports, fingerprint network services, calculate composite risk scores, and detect exposure drift against previous baselines.</p>
+
+      <form id="scan-form" class="scan-form" autocomplete="off">
+        <div class="scan-input-wrap">
+          <span class="scan-input-icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="m20 20-3.5-3.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <input
+            id="target-input"
+            type="text"
+            class="scan-input"
+            placeholder="Enter IP address or hostname (e.g. 127.0.0.1, scanme.nmap.org)"
+            required
+          >
+        </div>
+        <button type="submit" id="scan-btn" class="scan-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v10M7 12h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          Start Scan
+        </button>
+      </form>
+
+      <!-- Quick Target Presets -->
+      <div class="target-presets">
+        <span class="target-presets-label">Quick Presets:</span>
+        <button type="button" class="preset-chip" data-target="127.0.0.1">
+          <span>127.0.0.1</span>
+          <span class="target-meta">Localhost</span>
+        </button>
+        <button type="button" class="preset-chip" data-target="scanme.nmap.org">
+          <span>scanme.nmap.org</span>
+          <span class="target-meta">Nmap Public Sandbox</span>
+        </button>
+        <button type="button" class="preset-chip" data-target="192.168.1.1">
+          <span>192.168.1.1</span>
+          <span class="target-meta">Gateway Router</span>
+        </button>
+        <button type="button" class="preset-chip" data-target="10.0.0.1">
+          <span>10.0.0.1</span>
+          <span class="target-meta">Enclave Node</span>
+        </button>
+      </div>
+
+      <p id="scan-error" class="scan-error" hidden></p>
+    </div>
+
+    <!-- Telemetry Stat Grid -->
+    <section class="stat-grid" id="stat-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 20h8M12 18v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="badge badge-low">SURVEILLANCE</span>
+        </div>
+        <div class="stat-value" id="stat-assets">—</div>
+        <div class="stat-label">Monitored Assets</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-icon red">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <span class="badge badge-critical">CRITICAL</span>
+        </div>
+        <div class="stat-value" id="stat-critical" style="color:var(--omnitrix-red);">—</div>
+        <div class="stat-label">Critical Findings</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-icon amber">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12h4l3 8 4-16 3 8h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="badge badge-high">EXPOSURE</span>
+        </div>
+        <div class="stat-value" id="stat-avgrisk">—</div>
+        <div class="stat-label">Average Risk Score</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div class="stat-icon green">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M9 12.5l2 2 4-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="badge badge-low">COMPLETED</span>
+        </div>
+        <div class="stat-value" id="stat-scans">—</div>
+        <div class="stat-label">Total Scans Completed</div>
+      </div>
+    </section>
+
+    <!-- Widgets Grid -->
+    <div class="widgets-grid">
+      <div class="widgets-col">
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Recent Scans</h2>
+              <p class="panel-sub">Latest exposure scanning activity across all targets</p>
+            </div>
+            <button type="button" class="panel-link" onclick="window.switchCaempSubview('history')" style="background:none; border:none; cursor:pointer;">View all →</button>
+          </div>
+          <div id="recent-scans-list"><div class="empty-state">Loading scan data…</div></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Risk Score Trend</h2>
+              <p class="panel-sub">Composite risk progression across historical scans</p>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chart-risk-trend"></canvas>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="widgets-col">
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Severity Distribution</h2>
+              <p class="panel-sub">Aggregated findings categorized by severity rating</p>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="chart-severity"></canvas>
+          </div>
+          <div class="chart-legend" id="severity-legend"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Critical &amp; High Findings</h2>
+              <p class="panel-sub">Most recent elevated-risk vulnerabilities</p>
+            </div>
+          </div>
+          <div id="recent-findings-list"><div class="empty-state">Loading findings…</div></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head"><h2>Quick Actions</h2></div>
+          <div class="quick-actions">
+            <button type="button" class="quick-action" onclick="window.switchCaempSubview('history')">
+              <span class="quick-action-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </span>
+              <span>Scan History</span>
+            </button>
+            <button type="button" class="quick-action" onclick="window.switchCaempSubview('reports')">
+              <span class="quick-action-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/></svg>
+              </span>
+              <span>Export Reports</span>
+            </button>
+            <button type="button" class="quick-action" onclick="window.switchPlatformSection('phishguard')">
+              <span class="quick-action-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              </span>
+              <span>PhishGuard URL</span>
+            </button>
+            <a class="quick-action" href="https://nvd.nist.gov/" target="_blank" rel="noopener">
+              <span class="quick-action-icon">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 2L3 7v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z" stroke="currentColor" stroke-width="1.8"/></svg>
+              </span>
+              <span>NIST NVD Database</span>
+            </a>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBVIEW B: FULL SCAN HISTORY ARCHIVE -->
+  <div id="caemp-view-history" class="caemp-subview" style="display:none;">
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>All Scans Archive</h2>
+          <p class="panel-sub">Complete historical exposure log with keyword filtering and sorting</p>
+        </div>
+        <div class="table-toolbar">
+          <input type="text" id="history-search" class="table-search" placeholder="Search target...">
+          <select id="risk-filter" class="table-select">
+            <option value="">All Risk Levels</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data-table" id="history-table">
+          <thead>
+            <tr>
+              <th class="sortable" data-key="date">Date <span class="sort-arrow"></span></th>
+              <th class="sortable" data-key="target">Target <span class="sort-arrow"></span></th>
+              <th class="sortable" data-key="risk">Risk Score <span class="sort-arrow"></span></th>
+              <th data-key="level">Risk Level</th>
+              <th class="sortable" data-key="ports">Open Ports <span class="sort-arrow"></span></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in runs %}
+            <tr class="row-clickable" data-target="{{ r['target']|lower }}" data-level="{{ r['risk_level'] }}" onclick="window.location='{{ url_for('scan_results', scan_uid=r['scan_uid']) }}'">
+              <td data-label="Date" class="mono dim">{{ r["scan_date"] }}</td>
+              <td data-label="Target" class="mono" style="color:#fff; font-weight:700;">{{ r["target"] }}</td>
+              <td data-label="Risk Score" class="mono" style="font-weight:800;">{{ r["total_risk"] }}</td>
+              <td data-label="Risk Level">
+                <span class="badge badge-{{ 'critical' if r['risk_level'] == 'HIGH' else ('medium' if r['risk_level'] == 'MEDIUM' else 'low') }}">
+                  {{ r["risk_level"] }}
+                </span>
+              </td>
+              <td data-label="Open Ports" class="mono" style="color:var(--omnitrix-green);">{{ r["open_ports"] }}</td>
+              <td><a href="{{ url_for('scan_results', scan_uid=r['scan_uid']) }}" class="row-link">View →</a></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty-row">No scans recorded yet. Run your first scan from the Executive Overview.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <!-- SUBVIEW C: SECURITY REPORTS -->
+  <div id="caemp-view-reports" class="caemp-subview" style="display:none;">
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <h2>Generated Security Reports</h2>
+          <p class="panel-sub">{{ runs|length }} report{{ 's' if runs|length != 1 else '' }} available for export and offline analysis</p>
+        </div>
+      </div>
+
+      {% if runs %}
+      <div class="report-grid">
+        {% for r in runs %}
+        <div class="report-card">
+          <div class="report-card-top">
+            <div class="report-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8"/><path d="M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            </div>
+            <span class="badge badge-{{ 'critical' if r['risk_level'] == 'HIGH' else ('medium' if r['risk_level'] == 'MEDIUM' else 'low') }}">
+              {{ r["risk_level"] }}
+            </span>
+          </div>
+
+          <div>
+            <div class="report-card-target mono">{{ r["target"] }}</div>
+            <div class="report-card-meta">
+              <span>{{ r["scan_date"] }}</span> &middot;
+              <span>Risk score {{ r["total_risk"] }}</span> &middot;
+              <span>{{ r["open_ports"] }} open port{{ 's' if r['open_ports'] != 1 else '' }}</span>
+            </div>
+          </div>
+
+          <div class="report-card-footer">
+            <a href="{{ url_for('scan_results', scan_uid=r['scan_uid']) }}" class="row-link">View results →</a>
+            <a href="{{ url_for('download_report', scan_uid=r['scan_uid']) }}" class="btn btn-ghost btn-sm">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Download CSV
+            </a>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">No reports generated yet. Run a scan from the Executive Overview to generate your first report.</div>
+      {% endif %}
+    </section>
+  </div>
+
+  <!-- Omnitrix Pop-Up Scan Overlay -->
+  <div id="scan-overlay" class="scan-overlay" hidden>
+    <div class="overlay-card">
+      <div class="omnitrix-dial-wrap">
+        <div class="omnitrix-outer-bezel">
+          <div class="bezel-notch top"></div>
+          <div class="bezel-notch bottom"></div>
+          <div class="bezel-notch left"></div>
+          <div class="bezel-notch right"></div>
+        </div>
+        <div class="omnitrix-core-center">
+          <svg viewBox="0 0 100 100">
+            <polygon points="14,14 86,14 50,47" />
+            <polygon points="14,86 86,86 50,53" />
+          </svg>
+        </div>
+      </div>
+
+      <h2 class="overlay-title">Scanning Target Asset…</h2>
+      <p class="overlay-target mono" id="overlay-target-name">—</p>
+
+      <div class="overlay-progress-track">
+        <div class="overlay-progress-fill" id="overlay-progress-fill"></div>
+      </div>
+
+      <div class="step-list" id="step-list"></div>
+      <p class="overlay-hint">Do not close this window &middot; Analysis in progress</p>
+    </div>
+  </div>
+</div>
+
+<!-- =====================================================================
+     SECTION 2: PHISHGUARD LIVE URL INSPECTOR (SAME PAGE)
+     ===================================================================== -->
+<div id="section-phishguard" class="platform-section" style="display:none;">
+  <div class="page-header">
+    <div>
+      <p class="page-eyebrow">
+        <span class="status-dot pulse"></span>
+        GALVAN LEVEL-20 THREAT INTELLIGENCE &middot; MULTI-MODEL ML NEURAL CORE
+      </p>
+      <h1 class="page-title">Live URL Inspector &amp; Threat Analyzer</h1>
+      <p class="page-subtitle">Subword lexical topology, typosquatting &amp; homoglyph detection, multi-model consensus, and live DNS/SSL verification</p>
+    </div>
+
+    <div class="phish-engine-status-pill" id="phish-engine-status">
+      <span class="status-dot pulse"></span>
+      <span id="phish-engine-text">Omnitrix ML Neural Core: Initializing...</span>
+    </div>
+  </div>
+
+  <!-- Omnitrix URL Scanning Console -->
+  <div class="scan-card phish-scan-card">
+    <div class="scan-card-top">
+      <h2 class="scan-card-title">
+        <span class="omnitrix-emblem-mini" style="width:28px; height:28px;">
+          <svg viewBox="0 0 100 100" style="width:16px; height:16px;">
+            <polygon points="12,12 88,12 50,47" />
+            <polygon points="12,88 88,88 50,53" />
+          </svg>
+        </span>
+        Inspect Suspicious Target URL
+      </h2>
+      <span class="scan-card-badge">3-Model ML Consensus Active</span>
+    </div>
+    <p class="scan-card-sub">
+      Evaluate URLs across 3 independent machine learning models (Lexical Random Forest, Subword Char N-Gram TF-IDF, and Gradient Boosting Ensemble) combined with live port 443 SSL cryptographic analysis, live DNS resolution, and brand lookalike detection.
+    </p>
+
+    <form id="url-scan-form" class="scan-form" autocomplete="off">
+      <div class="scan-input-wrap">
+        <span class="scan-input-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+          </svg>
+        </span>
+        <input
+          id="url-input"
+          type="text"
+          class="scan-input"
+          placeholder="Enter target URL to inspect (e.g. http://paypa1-secure.login.verify.xyz/account)"
+          required
+        >
+        <button type="button" id="btn-clear-url" class="input-clear-btn" title="Clear input" style="display:none;">&times;</button>
+      </div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <button type="button" id="btn-sample-url" class="btn-preset-action" title="Load real-world phishing sample">
+          Load Sample
+        </button>
+        <button type="submit" id="btn-inspect-url" class="scan-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          Inspect Target
+        </button>
+      </div>
+    </form>
+
+    <!-- Quick URL Presets -->
+    <div class="target-presets">
+      <span class="target-presets-label">Target Presets:</span>
+      <button type="button" class="preset-chip" data-url="http://paypa1-secure.login.verify.xyz/account?ref=8a2f">
+        <span>paypa1-secure.xyz</span>
+        <span class="target-meta">Typosquat Spoof</span>
+      </button>
+      <button type="button" class="preset-chip" data-url="https://google.com">
+        <span>google.com</span>
+        <span class="target-meta">Verified Clean</span>
+      </button>
+      <button type="button" class="preset-chip" data-url="http://apple-security-check.icu/verify?session=92">
+        <span>apple-security.icu</span>
+        <span class="target-meta">Suspicious TLD</span>
+      </button>
+      <button type="button" class="preset-chip" data-url="http://192.168.1.1/admin/login">
+        <span>192.168.1.1/admin</span>
+        <span class="target-meta">Raw IP Host</span>
+      </button>
+    </div>
+
+    <p id="url-scan-error" class="scan-error" hidden></p>
+  </div>
+
+  <!-- Scanning Overlay -->
+  <div id="phish-scanning-box" class="phish-scanning-box" style="display:none;">
+    <div class="omnitrix-radar-loader">
+      <div class="radar-sweep"></div>
+      <div class="radar-core">
+        <svg viewBox="0 0 100 100">
+          <polygon points="12,12 88,12 50,47" />
+          <polygon points="12,88 88,88 50,53" />
+        </svg>
+      </div>
+    </div>
+    <div class="scanning-details">
+      <h3 class="scanning-headline">Consulting Omnitrix Multi-Model Neural Ensemble...</h3>
+      <div class="scanning-steps-list">
+        <div class="scan-step-item" id="step-lexical"><span class="step-bullet">&#9670;</span> Computing Shannon Entropy &amp; Lexical Vectors</div>
+        <div class="scan-step-item" id="step-typo"><span class="step-bullet">&#9670;</span> Scanning Brand Dictionary &amp; Unicode Homoglyphs</div>
+        <div class="scan-step-item" id="step-ml"><span class="step-bullet">&#9670;</span> Running Random Forest, Char N-Gram &amp; Gradient Boosting</div>
+        <div class="scan-step-item" id="step-net"><span class="step-bullet">&#9670;</span> Probing Live Host DNS &amp; Port 443 SSL Handshake</div>
+        <div class="scan-step-item" id="step-ai"><span class="step-bullet">&#9670;</span> Synthesizing AI Defensive Threat Advisory</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results View Container -->
+  <div id="phish-results-container">
+    <div class="phish-empty-card" id="phish-empty-state">
+      <div class="omnitrix-idle-dial">
+        <div class="idle-dial-ring"></div>
+        <div class="omnitrix-core-center" style="width:70px; height:70px;">
+          <svg viewBox="0 0 100 100" style="width:36px; height:36px; fill:var(--omnitrix-green);">
+            <polygon points="15,15 85,15 50,47" />
+            <polygon points="15,85 85,85 50,53" />
+          </svg>
+        </div>
+      </div>
+      <h3 style="font-family:var(--font-display); color:var(--text-main); margin-bottom:8px; font-size:16px;">
+        Ready for Neural URL Analysis
+      </h3>
+      <p style="color:var(--text-muted); max-width:540px; margin:0 auto; font-size:13.5px;">
+        Enter any suspicious web address, shortened link, or domain name above to trigger deep structural feature extraction, brand spoof detection, and multi-model consensus validation.
+      </p>
+    </div>
+
+    <div id="url-output" style="display:none;"></div>
+  </div>
+
+  <!-- Persistent Recent URL Scans Table -->
+  <div class="history-card" id="url-history-section" style="margin-top:36px;">
+    <div class="history-card-header">
+      <div>
+        <h2 class="history-card-title">Recent URL Threat Log</h2>
+        <p class="history-card-sub">Recorded URL surveillance history and consensus ratings from the local Omnitrix database</p>
+      </div>
+      <div style="display:flex; gap:10px;">
+        <button type="button" id="btn-refresh-history" class="btn-preset-action">Refresh Log</button>
+        <button type="button" id="btn-clear-history" class="btn-danger-action">Clear History</button>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="data-table" id="url-history-table">
+        <thead>
+          <tr>
+            <th>Timestamp</th>
+            <th>Inspected Target URL</th>
+            <th>Hostname</th>
+            <th>Threat Score</th>
+            <th>Verdict</th>
+            <th>ML Models Flagged</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="url-history-body">
+          <tr>
+            <td colspan="7" style="text-align:center; padding:24px; color:var(--text-dim);">
+              Loading recent URL scan history...
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+<script src="{{ url_for('static', filename='js/phishguard.js') }}"></script>
+{% endblock %}

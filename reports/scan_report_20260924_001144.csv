@@ -1,0 +1,7 @@
+Host,Port,State,Service,Version,Severity,Finding
+45.33.32.156,22,open,ssh,OpenSSH 6.6.1p1 Ubuntu 2ubuntu2.13,Low,SSH service detected - verify latest version
+45.33.32.156,25,filtered,smtp,,Info,No immediate issue detected
+45.33.32.156,80,open,http,Apache httpd 2.4.7,Medium,Apache detected - review version for known CVEs
+45.33.32.156,5060,filtered,sip,,Info,No immediate issue detected
+45.33.32.156,9929,open,nping-echo,Nping echo,Info,No immediate issue detected
+45.33.32.156,31337,open,tcpwrapped,,Info,No immediate issue detected

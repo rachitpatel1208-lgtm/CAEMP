@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}CAEMP — Cyber Asset Exposure Monitoring Platform{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+{% block head %}{% endblock %}
+</head>
+<body>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="omnitrix-emblem-mini">
+        <svg viewBox="0 0 100 100">
+          <polygon points="12,12 88,12 50,47" />
+          <polygon points="12,88 88,88 50,53" />
+        </svg>
+      </div>
+      <div class="sidebar-brand-text">
+        <span class="sidebar-brand-title">
+          {% if is_phishguard %}
+            PHISHGUARD <span class="sidebar-brand-tag">OMNITRIX ED.</span>
+          {% else %}
+            CAEMP <span class="sidebar-brand-tag">OMNITRIX ED.</span>
+          {% endif %}
+        </span>
+        <span class="sidebar-brand-sub">
+          {% if is_phishguard %}
+            AI URL Threat Intelligence
+          {% else %}
+            Exposure Monitoring
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <span class="sidebar-section-label">// CAEMP SURVEILLANCE</span>
+      <a href="/#overview" class="sidebar-link active" id="side-nav-caemp" data-section="caemp" data-subview="overview">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="3" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="14" y="12" width="7" height="9" rx="1.5" stroke="currentColor" stroke-width="1.8"/><rect x="3" y="16" width="7" height="5" rx="1.5" stroke="currentColor" stroke-width="1.8"/></svg>
+        Dashboard
+      </a>
+      <a href="/#history" class="sidebar-link {{ 'active' if request.path == '/history' }}" id="side-nav-history" data-section="caemp" data-subview="history">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        Scan History
+      </a>
+      <a href="/#reports" class="sidebar-link {{ 'active' if request.path == '/reports' }}" id="side-nav-reports" data-section="caemp" data-subview="reports">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 13h6M9 17h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        Security Reports
+      </a>
+
+      <span class="sidebar-section-label" style="margin-top:12px;">// PHISHGUARD CORE</span>
+      <a href="/#section-phishguard" class="sidebar-link" id="side-nav-phishguard" data-section="phishguard">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="11" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M12 8v3M12 14h.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        URL Inspector
+      </a>
+      <a href="/#url-history-section" class="sidebar-link" id="side-nav-phish-history" data-section="phishguard">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/><path d="M12 7v5l3.5 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        URL Threat Log
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-status"><span class="status-dot pulse"></span> Omnitrix Core Online</div>
+      CAEMP &bull; PhishGuard &middot; Omnitrix Edition
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="topbar-crumb">
+          <span id="topbar-crumb-section">CAEMP //</span>
+          <strong id="topbar-crumb-page">{% block crumb %}Dashboard{% endblock %}</strong>
+        </div>
+      </div>
+
+      <!-- Topbar Platform Section Switcher -->
+      <nav class="topbar-section-nav" id="topbar-section-nav" aria-label="Platform Section Switcher">
+        <button type="button" class="section-nav-tab active" id="tab-btn-caemp" data-section="caemp" title="Switch to CAEMP Cyber Asset Exposure Platform">
+          <span class="nav-tab-indicator">
+            <svg viewBox="0 0 100 100" class="nav-tab-omnitrix-icon">
+              <polygon points="15,15 85,15 50,47" />
+              <polygon points="15,85 85,85 50,53" />
+            </svg>
+          </span>
+          <span class="nav-tab-label">CAEMP</span>
+          <span class="nav-tab-badge">EXPOSURE</span>
+        </button>
+        <button type="button" class="section-nav-tab" id="tab-btn-phishguard" data-section="phishguard" title="Switch to PhishGuard ML URL Scanner">
+          <span class="nav-tab-indicator">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="nav-tab-shield-icon">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </span>
+          <span class="nav-tab-label">PHISHGUARD</span>
+          <span class="nav-tab-badge">URL SCANNER</span>
+        </button>
+      </nav>
+
+      <div class="topbar-actions">
+        <button class="topbar-shortcut-hint" id="topbar-quick-scan" title="Focus scan input">
+          <span>Quick Scan</span>
+          <kbd>/</kbd>
+        </button>
+
+        <div class="topbar-pill">
+          <span class="status-dot pulse"></span>
+          <span>System Operational</span>
+        </div>
+
+        <div class="omnitrix-status-avatar" title="Galvan Level-20 Technology">
+          <svg width="16" height="16" viewBox="0 0 100 100" fill="currentColor">
+            <polygon points="15,15 85,15 50,47" />
+            <polygon points="15,85 85,85 50,53" />
+          </svg>
+        </div>
+    </header>
+
+    <main class="page">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+      <span>{% if is_phishguard %}PhishGuard // Live URL Threat Intelligence{% else %}CAEMP // Cyber Asset Exposure Monitoring Platform{% endif %} (Omnitrix Edition)</span>
+      <span class="dim">Multi-Model ML Ensemble &bull; NIST Exposure Assessment &bull; Galvan Level-20 Technology</span>
+    </footer>
+  </div>
+</div>
+
+<div id="caemp-toast" class="caemp-toast"></div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
